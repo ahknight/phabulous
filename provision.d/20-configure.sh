@@ -1,3 +1,7 @@
+## PHP
+sed -i 's/upload_max_filesize =.*$/upload_max_filesize = 1G/' /etc/php5/apache2/php.ini
+sed -i 's/\;date.timezone \=.*$/date\.timezone \= \"America\/Chicago\"/' /etc/php5/apache2/php.ini
+
 ## Apache
 cat > /etc/apache2/sites-available/phabricator.conf <<EOF
 <VirtualHost *:80>
@@ -20,15 +24,13 @@ cat > /etc/apache2/sites-available/phabricator.conf <<EOF
   Require all granted
 </Directory>
 EOF
-
 a2dissite 000-default
 a2ensite phabricator
-
-## PHP
-sed -i 's/upload_max_filesize =.*$/upload_max_filesize = 1G/' /etc/php5/apache2/php.ini
-sed -i 's/\;date.timezone \=.*$/date\.timezone \= \"America\/Chicago\"/' /etc/php5/apache2/php.ini
-
 service apache2 restart
+
+## MySQL
+sed -i 's|^\[mysqld\]|\[mysqld\]\nsql_mode=STRICT_ALL_TABLES\n|' /etc/mysql/my.cnf
+service mysql restart
 
 ## Pharicator
 mkdir -p "$DST/repos" "$DST/files"
